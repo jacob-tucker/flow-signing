@@ -38,23 +38,23 @@ async function perform() {
   
   const sig = sign(USER_DOMAIN_TAG + msg);
   console.log({sig});
-  const publicKey = "f58ffa5eb30a0af06f142b35b7214683978b9166f8b7e910c9ae2b0bf987f3229275e7c32627924b1b0b22fad52619cd021ce0390b5a5f0809808d2faceefd80";
+  const keyIndex = 0;
+  const address = "0xfe433270356d985c";
 
   const response = await fcl.send([
     fcl.script`
-    pub fun main(publicKey: String, sig: String, data: String): Bool {
-      let bytes = publicKey.decodeHex()
-      let key = PublicKey(
-        publicKey: bytes,
-        signatureAlgorithm: SignatureAlgorithm.ECDSA_secp256k1
-      )
+    pub fun main(address: Address, keyIndex: Int, sig: String, data: String): Bool {
+      let account = getAccount(address)
+      let accountKey = account.keys.get(keyIndex: keyIndex) ?? panic("Provided key signature does not exist")
+      let key = accountKey.publicKey
       let sig = sig.decodeHex()
       let data = data.decodeHex()
       return key.verify(signature: sig, signedData: data, domainSeparationTag: "FLOW-V0.0-user", hashAlgorithm: HashAlgorithm.SHA3_256)
     }
     `,
     fcl.args([
-      fcl.arg(publicKey, t.String),
+      fcl.arg(address, t.Address),
+      fcl.arg(keyIndex, t.Int),
       fcl.arg(sig, t.String),
       fcl.arg(msg, t.String)
     ])

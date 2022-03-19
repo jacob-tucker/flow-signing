@@ -20,6 +20,7 @@ const USER_DOMAIN_TAG = rightPaddedHexBuffer(
 ).toString('hex');
 
 async function perform() {
+  let originalMsg = "CHANGE_DISCORD";
   const msg = Buffer.from("CHANGE_DISCORD").toString('hex');
   console.log({msg});
   
@@ -32,7 +33,7 @@ async function perform() {
     kmsKeyIds
   );
   
-  const sig = await signer.sign(USER_DOMAIN_TAG + msg);
+  const sig = await signer.signUserMessage(originalMsg);
   
   console.log({sig});
   const keyIndex = 1;
